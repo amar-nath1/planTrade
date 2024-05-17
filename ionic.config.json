@@ -1,0 +1,7 @@
+{
+  "name": "stockCalc",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

@@ -1,0 +1,27 @@
+.inputField{
+  border: 1px solid gray;
+}
+
+.div-show{
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.div-stk{
+  border: 1px solid grey;
+  flex-grow: 1;
+}
+
+.commission-input{
+  width: 6rem
+}
+.border-grid{
+  // border-top: 3px solid blue;
+}
+.row-background{
+  background-color: rgb(253, 255, 253);
+  border: 3px solid white;
+}
+.text-style{
+  // color:white
+}

@@ -1,0 +1,338 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Stock Profit Predictor 
+      <ion-segment [value]="investmentSegmentSelected">
+        <ion-segment-button (click)="changeInvestmentMode('delivery')" value="delivery">
+          <ion-label>Delivery</ion-label>
+        </ion-segment-button>
+        <ion-segment-button (click)="changeInvestmentMode('intraday')" value="intraday">
+          <ion-label>Intraday</ion-label>
+        </ion-segment-button>
+       
+      </ion-segment>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+
+
+
+<!-- delivery UI -->
+<ion-content *ngIf="investmentSegmentSelected==='delivery'" [fullscreen]="true">
+
+
+
+  <ion-grid class="ion-margin ion-padding">
+  <ion-row>
+    <ion-col size="4" class="ion-text-center">
+      <ion-label>Price Rise</ion-label>
+        <ion-input [(ngModel)]="priceRise" (ionChange)="saveToStorage()" (ionFocus)="selectInputBox(priceRiseField)" #priceRiseField class="inputField" type="number"></ion-input>
+    </ion-col>
+    <ion-col size="4" class="ion-text-center">
+      <ion-label>Count</ion-label>
+        <ion-input [(ngModel)]="shareCount" (ionChange)="saveToStorage()" (ionFocus)="selectInputBox(sharesCountField)" #sharesCountField  class="inputField" type="number"></ion-input>
+    </ion-col>
+    
+    <ion-col size="4" class="ion-text-center">
+      <ion-label>Buy Price</ion-label>
+      <ion-input [(ngModel)]="currentPrice" (ionChange)="saveToStorage()" (ionFocus)="selectInputBox(currentPriceField)" #currentPriceField  class="inputField" type="number"></ion-input>
+  </ion-col>
+  </ion-row>
+</ion-grid>
+
+<ion-grid  class="border-grid ion-margin-horizontal ion-padding-horizontal" >
+  <ion-row class="row-background ">
+    <ion-col size="6" class="ion-justify-content-center" style="display: flex; flex-direction: column;">
+      <h4 class="ion-margin-horizontal text-style">Buy date</h4>
+      <ion-datetime-button datetime="datetime" ></ion-datetime-button>
+
+<ion-popover  [keepContentsMounted]="true">
+  <ng-template>
+    <ion-datetime [max]="currentDate" [(ngModel)]="enteredDate" (ionChange)="calculateDays()" [showDefaultButtons]="true" presentation="date" id="datetime"></ion-datetime>
+  </ng-template>
+</ion-popover>
+      
+    </ion-col>
+    <ion-col size="6" class="ion-text-center" style="display: flex; flex-direction: column;">
+      <h4 class="text-style" *ngIf="numberOfDays !== null">Days: </h4>
+      <ion-text>{{ numberOfDays }}</ion-text>
+     
+    </ion-col>
+  </ion-row>
+</ion-grid>
+
+<ion-grid class="border-grid ion-margin ion-padding-horizontal">
+  <ion-row class="row-background">
+    <ion-col size="6" >
+        <h4 class="ion-text-center text-style">Inhand Return:-</h4>
+    </ion-col>
+    <ion-col size="6" color="light">
+       <h4 class="text-style">Rs. {{(priceRise*shareCount-currentPrice*shareCount)-(priceRise*shareCount*commissionPercent/100) | number}}</h4>
+    </ion-col>
+  </ion-row>
+
+  <ion-row class="row-background">
+    <ion-col size="6" class="ion-text-center">
+       <h4 class="text-style"> Final Return:-</h4>
+    </ion-col>
+    <ion-col size="6" >
+       <h4 class="text-style"> {{((((priceRise*shareCount)-(currentPrice*shareCount))-((priceRise*shareCount*commissionPercent)/100))/(currentPrice*shareCount))*100 | number : '1.2-2'}} %</h4>
+    </ion-col>
+  </ion-row>
+
+  <ion-row class="row-background">
+    <ion-col size="6" class="ion-text-center">
+       <h4 class="text-style"> For 10% Return:-</h4>
+    </ion-col>
+    <ion-col size="6" >
+       <h4 class="text-style">Rs. {{(currentPrice*1.104) | number: '1.2-2'}}</h4>
+    </ion-col>
+  </ion-row>
+  <ion-row class="row-background">
+    <ion-col size="6" class="ion-text-center">
+       <h4 class="text-style"> Share Up:-</h4>
+    </ion-col>
+    <ion-col size="6" >
+       <h4 class="text-style">Rs. {{priceRise-currentPrice}} </h4>
+    </ion-col>
+  </ion-row>
+
+  
+</ion-grid>
+
+<ion-grid class="border-grid ion-margin ion-padding">
+  <ion-row class="row-background">
+    <ion-col size="6" class="ion-text-center">
+       <h4 class="text-style"> Invested Amount:-</h4>
+    </ion-col>
+    <ion-col size="6" >
+       <h4 class="text-style">Rs. {{currentPrice*shareCount}}</h4>
+    </ion-col>
+  </ion-row>
+
+  
+
+  <ion-row class="row-background">
+    <ion-col size="6" class="ion-text-center">
+       <h4 class="text-style"> Received Amount:-</h4>
+    </ion-col>
+    <ion-col size="6" >
+       <h4 class="text-style">Rs. {{priceRise*shareCount}}</h4>
+    </ion-col>
+  </ion-row>
+ 
+
+
+  <ion-row class="row-background">
+    <ion-col size="6" class="ion-text-center">
+       <h4 class="text-style"> Gain :-</h4>
+    </ion-col>
+    <ion-col size="6" >
+       <h4 class="text-style">Rs. {{priceRise*shareCount-currentPrice*shareCount}}</h4>
+    </ion-col>
+  </ion-row>
+</ion-grid>
+
+<ion-accordion-group>
+  <ion-accordion value="first">
+    <ion-item slot="header" color="light">
+      <ion-label>View Details</ion-label>
+    </ion-item>
+    <div class="ion-padding" slot="content">
+      <ion-grid>
+        <ion-row class="row-background">
+          <ion-col size="6" class="ion-text-center">
+             <h4 class="text-style"> Return :- </h4>
+          </ion-col>
+          <ion-col size="6" >
+           <h4 class="text-style"> {{(((priceRise*shareCount)-(currentPrice*shareCount))/(currentPrice*shareCount))*100 | number: '1.2-2'}} %</h4>
+          </ion-col>
+        </ion-row>
+      
+        <ion-row class="row-background">
+          <ion-col size="6" class="ion-text-center">
+             <h4 class="text-style"> Commission %</h4>
+          </ion-col>
+          <ion-col size="6" >
+            <input class="commission-input" [(ngModel)]="commissionPercent" type="number" placeholder="commission %">
+          </ion-col>
+        </ion-row>
+      
+        <ion-row class="row-background">
+          <ion-col size="6" class="ion-text-center">
+             <h4 class="text-style"> Commision Charged:-</h4>
+          </ion-col>
+          <ion-col size="6" >
+            <h4 class="text-style">Rs. {{(priceRise*shareCount*commissionPercent/100) | number:'1.2-2'}}</h4>
+          </ion-col>
+        </ion-row>
+      
+      </ion-grid>
+
+    </div>
+  </ion-accordion>
+  
+</ion-accordion-group>
+</ion-content>
+
+
+
+<!-- intraday UI -->
+<ion-content *ngIf="investmentSegmentSelected==='intraday'" [fullscreen]="true">
+
+
+
+  <ion-grid class="ion-margin ion-padding">
+  <ion-row>
+    <ion-col size="4" class="ion-text-center">
+      <ion-label>Price Rise</ion-label>
+        <ion-input [(ngModel)]="priceRise" (ionChange)="saveToStorage()" (ionFocus)="selectInputBox(priceRiseField)" #priceRiseField class="inputField" type="number"></ion-input>
+    </ion-col>
+    <ion-col size="4" class="ion-text-center">
+      <ion-label>Count</ion-label>
+        <ion-input [(ngModel)]="shareCount" (ionChange)="saveToStorage()" (ionFocus)="selectInputBox(sharesCountField)" #sharesCountField  class="inputField" type="number"></ion-input>
+    </ion-col>
+    
+    <ion-col size="4" class="ion-text-center">
+      <ion-label>Current Price</ion-label>
+      <ion-input [(ngModel)]="intradayCalc.currentPrice" (ionChange)="calculateIntraday()" (ionFocus)="selectInputBox(currentPriceField)" #currentPriceField  class="inputField" type="number"></ion-input>
+  </ion-col>
+  </ion-row>
+</ion-grid>
+
+<ion-grid  class="border-grid ion-margin-horizontal ion-padding-horizontal" >
+  <ion-row class="row-background ">
+    <ion-col size="6" class="ion-justify-content-center" style="display: flex; flex-direction: column;">
+      <h4 class="ion-margin-horizontal text-style">Buy date</h4>
+      <ion-datetime-button datetime="datetime" ></ion-datetime-button>
+
+<ion-popover  [keepContentsMounted]="true">
+  <ng-template>
+    <ion-datetime [max]="currentDate" [(ngModel)]="enteredDate" (ionChange)="calculateDays()" [showDefaultButtons]="true" presentation="date" id="datetime"></ion-datetime>
+  </ng-template>
+</ion-popover>
+      
+    </ion-col>
+    <ion-col size="6" class="ion-text-center" style="display: flex; flex-direction: column;">
+      <h4 class="text-style" *ngIf="numberOfDays !== null">Days: </h4>
+      <ion-text>{{ numberOfDays }}</ion-text>
+     
+    </ion-col>
+  </ion-row>
+</ion-grid>
+
+<ion-grid class="border-grid ion-margin ion-padding-horizontal">
+  <ion-row class="row-background">
+    <ion-col size="6" >
+        <h4 class="ion-text-center text-style">Inhand Return:-</h4>
+    </ion-col>
+    <ion-col size="6" color="light">
+       <h4 class="text-style">Rs. {{(priceRise*shareCount-currentPrice*shareCount)-(priceRise*shareCount*commissionPercent/100) | number}}</h4>
+    </ion-col>
+  </ion-row>
+
+  <ion-row class="row-background">
+    <ion-col size="6" class="ion-text-center">
+       <h4 class="text-style"> Profit Price-</h4>
+    </ion-col>
+    <ion-col size="6" >
+       <h4 class="text-style"> {{intradayCalc.profitPrice}} %</h4>
+    </ion-col>
+  </ion-row>
+
+  <ion-row class="row-background">
+    <ion-col size="6" class="ion-text-center">
+       <h4 class="text-style"> stoploss Price-</h4>
+    </ion-col>
+    <ion-col size="6" >
+       <h4 class="text-style">Rs. {{intradayCalc.stopLossPrice}}</h4>
+    </ion-col>
+  </ion-row>
+  <ion-row class="row-background">
+    <ion-col size="6" class="ion-text-center">
+       <h4 class="text-style"> Share Up:-</h4>
+    </ion-col>
+    <ion-col size="6" >
+       <h4 class="text-style">Rs. {{priceRise-currentPrice}} </h4>
+    </ion-col>
+  </ion-row>
+
+  
+</ion-grid>
+
+<ion-grid class="border-grid ion-margin ion-padding">
+  <ion-row class="row-background">
+    <ion-col size="6" class="ion-text-center">
+       <h4 class="text-style"> Invested Amount:-</h4>
+    </ion-col>
+    <ion-col size="6" >
+       <h4 class="text-style">Rs. {{currentPrice*shareCount}}</h4>
+    </ion-col>
+  </ion-row>
+
+  
+
+  <ion-row class="row-background">
+    <ion-col size="6" class="ion-text-center">
+       <h4 class="text-style"> Received Amount:-</h4>
+    </ion-col>
+    <ion-col size="6" >
+       <h4 class="text-style">Rs. {{priceRise*shareCount}}</h4>
+    </ion-col>
+  </ion-row>
+ 
+
+
+  <ion-row class="row-background">
+    <ion-col size="6" class="ion-text-center">
+       <h4 class="text-style"> Gain :-</h4>
+    </ion-col>
+    <ion-col size="6" >
+       <h4 class="text-style">Rs. {{priceRise*shareCount-currentPrice*shareCount}}</h4>
+    </ion-col>
+  </ion-row>
+</ion-grid>
+
+<ion-accordion-group>
+  <ion-accordion value="first">
+    <ion-item slot="header" color="light">
+      <ion-label>View Details</ion-label>
+    </ion-item>
+    <div class="ion-padding" slot="content">
+      <ion-grid>
+        <ion-row class="row-background">
+          <ion-col size="6" class="ion-text-center">
+             <h4 class="text-style"> Return :- </h4>
+          </ion-col>
+          <ion-col size="6" >
+           <h4 class="text-style"> {{(((priceRise*shareCount)-(currentPrice*shareCount))/(currentPrice*shareCount))*100 | number: '1.2-2'}} %</h4>
+          </ion-col>
+        </ion-row>
+      
+        <ion-row class="row-background">
+          <ion-col size="6" class="ion-text-center">
+             <h4 class="text-style"> Stop Loss %</h4>
+          </ion-col>
+          <ion-col size="6" >
+            <input class="commission-input" [(ngModel)]="intradayCalc.stopLossPercent" type="number" placeholder="commission %">
+          </ion-col>
+        </ion-row>
+      
+        <ion-row class="row-background">
+          <ion-col size="6" class="ion-text-center">
+             <h4 class="text-style"> Commision Charged:-</h4>
+          </ion-col>
+          <ion-col size="6" >
+            <h4 class="text-style">Rs. {{(priceRise*shareCount*commissionPercent/100) | number:'1.2-2'}}</h4>
+          </ion-col>
+        </ion-row>
+      
+      </ion-grid>
+
+    </div>
+  </ion-accordion>
+  
+</ion-accordion-group>
+</ion-content>
+
